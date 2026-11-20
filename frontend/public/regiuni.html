@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="ro" dir="ltr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>Regiuni MeshCore România — RO-MESH</title>
+  <meta name="description"
+    content="Lista completă a regiunilor MeshCore pentru România (ierarhie DAG: europe, ro, 8 macro-regiuni NUTS-2 și 42 regiuni județene) extrasă din configuratorul RO-MESH." />
+
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#2DC653" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" />
+
+  <script>
+    (function () {
+      'use strict';
+      var stored = '';
+      try { stored = localStorage.getItem('ro-mesh-theme') || ''; } catch (e) { }
+      if (stored === 'dark' || stored === 'light') {
+        document.documentElement.setAttribute('data-theme', stored);
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/scroll-top.css" />
+
+  <style>
+    .regions-page {
+      padding-top: calc(64px + var(--space-8));
+      padding-bottom: var(--space-16);
+    }
+
+    .regions-wrap {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 var(--space-4);
+    }
+
+    .regions-breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-4);
+    }
+
+    .regions-breadcrumb a {
+      color: var(--color-accent-dark);
+      text-decoration: none;
+      font-weight: var(--fw-medium);
+    }
+
+    [data-theme="dark"] .regions-breadcrumb a {
+      color: var(--color-accent);
+    }
+
+    .regions-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .regions-hero {
+      margin-bottom: var(--space-8);
+    }
+
+    .regions-hero h1 {
+      font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+      font-weight: var(--fw-bold);
+      line-height: var(--lh-tight);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-3) 0;
+    }
+
+    .regions-lead {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: var(--lh-normal);
+      max-width: 72ch;
+      margin: 0;
+    }
+
+    /* ── Ierarhie DAG (4 niveluri) ── */
+    .dag-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .dag-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-nav-border);
+      border-radius: 12px;
+      padding: var(--space-4);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .dag-tier {
+      font-size: var(--text-xs);
+      font-weight: var(--fw-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-accent-dark);
+    }
+
+    [data-theme="dark"] .dag-tier {
+      color: var(--color-accent);
+    }
+
+    .dag-card h2 {
+      font-size: var(--text-base);
+      font-weight: var(--fw-bold);
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+
+    .dag-card p {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .dag-scopes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: auto;
+      padding-top: 0.25rem;
+    }
+
+    /* ── Scope Pill + Copy ── */
+    .scope-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      border: 1px solid rgba(45, 198, 83, 0.35);
+      background: rgba(45, 198, 83, 0.1);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      transition: background 150ms ease, border-color 150ms ease, transform 120ms ease;
+      line-height: 1.3;
+    }
+
+    .scope-btn:hover,
+    .scope-btn:focus-visible {
+      background: rgba(45, 198, 83, 0.2);
+      border-color: var(--color-accent);
+      outline: none;
+    }
+
+    .scope-btn:active {
+      transform: scale(0.97);
+    }
+
+    .scope-btn.copied {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #0b1610;
+    }
+
+    .scope-btn svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+      opacity: 0.75;
+    }
+
+    .channel-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.18rem 0.45rem;
+      border-radius: 5px;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+    }
+
+    /* ── Bară Căutare & Filtrare ── */
+    .filter-panel {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-nav-border);
+      border-radius: 12px;
+      padding: var(--space-4);
+      margin-bottom: var(--space-6);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1 1 280px;
+      min-width: 0;
+    }
+
+    .search-input-wrap svg {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 17px;
+      height: 17px;
+      color: var(--color-text-mid);
+      pointer-events: none;
+    }
+
+    .region-search-input {
+      width: 100%;
+      padding: 0.65rem 0.9rem 0.65rem 2.5rem;
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      color: var(--color-text-primary);
+      background: var(--color-bg);
+      border: 1px solid var(--color-nav-border-scrolled);
+      border-radius: 8px;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .region-search-input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-accent-glow);
+    }
+
+    .filter-stats {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      font-weight: var(--fw-medium);
+      white-space: nowrap;
+    }
+
+    .macro-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .macro-chip {
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: var(--fw-medium);
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--color-nav-border-scrolled);
+      background: var(--color-bg);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+    }
+
+    .macro-chip:hover {
+      border-color: var(--color-accent);
+      color: var(--color-text-primary);
+    }
+
+    .macro-chip.active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #0b1610;
+      font-weight: var(--fw-semibold);
+    }
+
+    /* ── Secțiuni Macro-Regiuni ── */
+    .regions-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .macro-section {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-nav-border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .macro-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-bg-secondary);
+      border-bottom: 1px solid var(--color-nav-border);
+    }
+
+    .macro-title-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .nuts-badge {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 5px;
+      background: var(--color-text-primary);
+      color: var(--color-bg-card);
+      letter-spacing: 0.04em;
+    }
+
+    .macro-header h2 {
+      font-size: var(--text-lg);
+      font-weight: var(--fw-bold);
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+
+    .macro-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+    }
+
+    .counties-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+
+    .counties-table th {
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: var(--fw-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-mid);
+      padding: 0.7rem var(--space-5);
+      border-bottom: 1px solid var(--color-nav-border);
+      background: var(--color-surface-warm);
+    }
+
+    .counties-table td {
+      padding: 0.75rem var(--space-5);
+      border-bottom: 1px solid var(--color-nav-border);
+      vertical-align: middle;
+      color: var(--color-text-primary);
+    }
+
+    .counties-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .county-name-cell {
+      font-weight: var(--fw-semibold);
+      white-space: nowrap;
+    }
+
+    .county-code {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.1rem 0.4rem;
+      margin-left: 0.35rem;
+      border-radius: 4px;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-secondary);
+    }
+
+    .channels-cell {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .cities-cell {
+      color: var(--color-text-secondary);
+      line-height: 1.45;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--space-10) var(--space-4);
+      background: var(--color-bg-card);
+      border: 1px dashed var(--color-nav-border-scrolled);
+      border-radius: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Referință CLI MeshCore ── */
+    .cli-section {
+      margin-top: var(--space-10);
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-nav-border);
+      border-radius: 14px;
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cli-section h2 {
+      font-size: var(--text-lg);
+      font-weight: var(--fw-bold);
+      margin: 0 0 var(--space-2) 0;
+      color: var(--color-text-primary);
+    }
+
+    .cli-section p {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin: 0 0 var(--space-4) 0;
+      line-height: 1.55;
+    }
+
+    .cli-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+
+    .cli-box {
+      background: var(--color-bg);
+      border: 1px solid var(--color-nav-border);
+      border-radius: 10px;
+      padding: var(--space-4);
+    }
+
+    .cli-box h3 {
+      font-size: var(--text-sm);
+      font-weight: var(--fw-bold);
+      color: var(--color-text-primary);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .cli-box pre {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      color: var(--color-text-primary);
+      overflow-x: auto;
+    }
+
+    /* ── Toast Copiere ── */
+    .copy-toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--color-text-primary);
+      color: var(--color-bg-card);
+      font-size: var(--text-sm);
+      font-weight: var(--fw-medium);
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+      z-index: 1200;
+    }
+
+    .copy-toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 960px) {
+      .dag-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .dag-grid,
+      .cli-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .macro-header {
+        padding: var(--space-3) var(--space-4);
+      }
+
+      .counties-table thead {
+        display: none;
+      }
+
+      .counties-table,
+      .counties-table tbody,
+      .counties-table tr,
+      .counties-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .counties-table tr {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--color-nav-border);
+      }
+
+      .counties-table tr:last-child {
+        border-bottom: none;
+      }
+
+      .counties-table td {
+        padding: 0.28rem 0;
+        border-bottom: none;
+      }
+
+      .counties-table td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.7rem;
+        font-weight: var(--fw-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--color-text-mid);
+        margin-bottom: 0.15rem;
+      }
+
+      .counties-table td.county-name-cell::before {
+        display: none;
+      }
+
+      .county-name-cell {
+        font-size: var(--text-base);
+        margin-bottom: 0.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-text">RO-<span class="logo-accent">MESH</span></span> <span class="status-pill alpha">alpha</span>
+      </a>
+
+      <button id="open-search-btn" class="lupa-icon" aria-label="Caută">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+
+      <div class="theme-toggle" id="theme-toggle" role="group" aria-label="Comutați tema interfeței">
+        <button class="theme-btn" id="theme-auto" data-theme-val="" title="Automatic — urmează tema OS"
+          aria-pressed="true" aria-label="Temă automată (sistem)">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" />
+          </svg>
+        </button>
+        <button class="theme-btn" id="theme-light" data-theme-val="light" title="Luminos" aria-pressed="false"
+          aria-label="Temă luminoasă">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+          </svg>
+        </button>
+        <button class="theme-btn" id="theme-dark" data-theme-val="dark" title="Întunecat" aria-pressed="false"
+          aria-label="Temă întunecată">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="regions-page">
+    <div class="regions-wrap">
+      <nav class="regions-breadcrumb" aria-label="Navigare">
+        <a href="/">Acasă</a>
+        <span aria-hidden="true">/</span>
+        <a href="/meshcore/">MeshCore</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Regiuni România</span>
+      </nav>
+
+      <header class="regions-hero">
+        <h1>Regiuni MeshCore — România</h1>
+        <p class="regions-lead">
+          Structura ierarhică de regiuni (<code>region_scope</code>) din configuratorul RO-MESH Companion,
+          aliniată standardului NUTS-2 (8 macro-regiuni, 41 de județe și Municipiul București) pentru limitarea
+          controlată a traficului flood în rețelele MeshCore. Apasă pe orice identificator pentru a-l copia.
+        </p>
+      </header>
+
+      <!-- Ierarhie DAG pe 4 niveluri -->
+      <section class="dag-grid" aria-label="Ierarhia regiunilor MeshCore">
+        <article class="dag-card">
+          <span class="dag-tier">Nivel 1 · European</span>
+          <h2>Pan-European</h2>
+          <p>Canalul deschis general <code>Public</code>, audibil transfrontalier.</p>
+          <div class="dag-scopes">
+            <button type="button" class="scope-btn" data-copy="europe" title="Copiază scope europe">europe</button>
+          </div>
+        </article>
+
+        <article class="dag-card">
+          <span class="dag-tier">Nivel 2 · Național</span>
+          <h2>România</h2>
+          <p>Scope național pentru <code>#romania</code> și canalul de urgențe <code>#sos</code>. Părinte pentru toate macro-regiunile.</p>
+          <div class="dag-scopes">
+            <button type="button" class="scope-btn" data-copy="ro" title="Copiază scope ro">ro</button>
+          </div>
+        </article>
+
+        <article class="dag-card">
+          <span class="dag-tier">Nivel 3 · NUTS-2</span>
+          <h2>8 Macro-Regiuni</h2>
+          <p>Interconectează județele din aceeași regiune (<code>#nord-vest</code>, <code>#centru</code>, etc.). Părinte: <code>ro</code>.</p>
+          <div class="dag-scopes">
+            <span class="channel-tag">RO11 → RO42</span>
+          </div>
+        </article>
+
+        <article class="dag-card">
+          <span class="dag-tier">Nivel 4 · Județean</span>
+          <h2>42 Regiuni Locale</h2>
+          <p>Limitează traficul pe județ pentru <code>#&lt;cod&gt;</code>, <code>#alerte</code> și canalele urbane (<code>#&lt;oras&gt;</code>).</p>
+          <div class="dag-scopes">
+            <span class="channel-tag">ro-ab … ro-vn, ro-b</span>
+          </div>
+        </article>
+      </section>
+
+      <!-- Căutare și filtrare -->
+      <section class="filter-panel" aria-label="Filtrare regiuni">
+        <div class="filter-top">
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="search" id="region-search" class="region-search-input"
+              placeholder="Caută județ, cod auto (ex. BV), scope (ro-cj), macro-regiune sau oraș..."
+              aria-label="Caută regiune, județ sau oraș" autocomplete="off" />
+          </div>
+          <div id="filter-stats" class="filter-stats" aria-live="polite">8 macro-regiuni · 42 județe</div>
+        </div>
+        <div id="macro-chips" class="macro-chips" role="group" aria-label="Filtrare după macro-regiune NUTS-2"></div>
+      </section>
+
+      <!-- Lista generată din structura oficială -->
+      <section id="regions-container" class="regions-list" aria-label="Lista macro-regiunilor și județelor"></section>
+
+      <!-- Referință CLI din configurator -->
+      <section class="cli-section" aria-labelledby="cli-heading">
+        <h2 id="cli-heading">Referință configurare regiuni în MeshCore CLI</h2>
+        <p>
+          Exemplu de legare a ierarhiei DAG pentru un nod din județul Brașov (<code>ro-bv</code> → <code>ro-centru</code> → <code>ro</code>),
+          conform regulilor de provisionare din configuratorul RO-MESH:
+        </p>
+        <div class="cli-grid">
+          <div class="cli-box">
+            <h3>Repetor (scop județean + lanț către ro)</h3>
+            <pre><code>region put ro-bv ro-centru
+region put ro-centru ro
+region home ro-bv
+region default ro-bv</code></pre>
+          </div>
+          <div class="cli-box">
+            <h3>Companion (scop implicit național)</h3>
+            <pre><code>region home ro
+region default ro</code></pre>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="copy-toast" class="copy-toast" role="status" aria-live="polite"></div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+              class="svg-inline">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path d="M2 17L12 22L22 17" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path d="M2 12L12 17L22 12" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            <span class="logo-text">RO-<span class="logo-accent">MESH</span></span>
+          </div>
+          <p class="footer-tagline">RO-MESH — Comunitatea rețelelor radio descentralizate din România.</p>
+        </div>
+
+        <div class="footer-links">
+          <h4>Linkuri Rapide</h4>
+          <ul>
+            <li><a href="/">Acasă</a></li>
+            <li><a href="/dictionar.html">Dicționar</a></li>
+            <li><a href="/comunitati.html">Comunități</a></li>
+            <li><a href="/regiuni.html">Regiuni MeshCore</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Protocoale</h4>
+          <ul>
+            <li><a href="/meshcore/">MeshCore</a></li>
+            <li><a href="/meshtastic/">Meshtastic</a></li>
+            <li><a href="/reticulum/">Reticulum</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-info">
+          <h4>Informații</h4>
+          <p>Proiect Open-Source dedicat rezilienței.</p>
+          <p class="copyright">&copy; <span id="current-year"></span> RO-MESH. Toate drepturile rezervate.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>document.getElementById('current-year').textContent = new Date().getFullYear();</script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var MACRO_REGIONS = [
+        { id: 'ro-nord-vest', name: 'Nord-Vest', nuts: 'RO11', parent: 'ro', channel: '#nord-vest' },
+        { id: 'ro-centru', name: 'Centru', nuts: 'RO12', parent: 'ro', channel: '#centru' },
+        { id: 'ro-nord-est', name: 'Nord-Est', nuts: 'RO21', parent: 'ro', channel: '#nord-est' },
+        { id: 'ro-sud-est', name: 'Sud-Est', nuts: 'RO22', parent: 'ro', channel: '#sud-est' },
+        { id: 'ro-sud-muntenia', name: 'Sud - Muntenia', nuts: 'RO31', parent: 'ro', channel: '#sud-muntenia' },
+        { id: 'ro-b-if', name: 'București - Ilfov', nuts: 'RO32', parent: 'ro', channel: '#bucuresti-ilfov' },
+        { id: 'ro-sud-vest-oltenia', name: 'Sud-Vest Oltenia', nuts: 'RO41', parent: 'ro', channel: '#sud-vest-oltenia' },
+        { id: 'ro-vest', name: 'Vest', nuts: 'RO42', parent: 'ro', channel: '#vest' }
+      ];
+
+      var COUNTIES = [
+        { code: 'BH', name: 'Bihor', region: 'ro-bh', macro: 'ro-nord-vest', cities: ['Oradea', 'Salonta', 'Marghita', 'Beiuș'] },
+        { code: 'BN', name: 'Bistrița-Năsăud', region: 'ro-bn', macro: 'ro-nord-vest', cities: ['Bistrița', 'Beclean', 'Năsăud', 'Sângeorz-Băi'] },
+        { code: 'CJ', name: 'Cluj', region: 'ro-cj', macro: 'ro-nord-vest', cities: ['Cluj-Napoca', 'Turda', 'Dej', 'Câmpia Turzii', 'Gherla', 'Huedin'] },
+        { code: 'MM', name: 'Maramureș', region: 'ro-mm', macro: 'ro-nord-vest', cities: ['Baia Mare', 'Sighetu Marmației', 'Borșa', 'Vișeu de Sus'] },
+        { code: 'SM', name: 'Satu Mare', region: 'ro-sm', macro: 'ro-nord-vest', cities: ['Satu Mare', 'Carei', 'Negrești-Oaș', 'Tășnad'] },
+        { code: 'SJ', name: 'Sălaj', region: 'ro-sj', macro: 'ro-nord-vest', cities: ['Zalău', 'Șimleu Silvaniei', 'Jibou'] },
+
+        { code: 'AB', name: 'Alba', region: 'ro-ab', macro: 'ro-centru', cities: ['Alba Iulia', 'Sebeș', 'Aiud', 'Blaj', 'Cugir'] },
+        { code: 'BV', name: 'Brașov', region: 'ro-bv', macro: 'ro-centru', cities: ['Brașov', 'Făgăraș', 'Săcele', 'Zărnești', 'Codlea', 'Râșnov'] },
+        { code: 'CV', name: 'Covasna', region: 'ro-cv', macro: 'ro-centru', cities: ['Sfântu Gheorghe', 'Târgu Secuiesc', 'Covasna', 'Baraolt'] },
+        { code: 'HR', name: 'Harghita', region: 'ro-hr', macro: 'ro-centru', cities: ['Miercurea Ciuc', 'Odorheiu Secuiesc', 'Gheorgheni', 'Toplița'] },
+        { code: 'MS', name: 'Mureș', region: 'ro-ms', macro: 'ro-centru', cities: ['Târgu Mureș', 'Reghin', 'Sighișoara', 'Târnăveni', 'Luduș'] },
+        { code: 'SB', name: 'Sibiu', region: 'ro-sb', macro: 'ro-centru', cities: ['Sibiu', 'Mediaș', 'Cisnădie', 'Avrig', 'Agnita'] },
+
+        { code: 'BC', name: 'Bacău', region: 'ro-bc', macro: 'ro-nord-est', cities: ['Bacău', 'Onești', 'Moinești', 'Comănești'] },
+        { code: 'BT', name: 'Botoșani', region: 'ro-bt', macro: 'ro-nord-est', cities: ['Botoșani', 'Dorohoi', 'Darabani'] },
+        { code: 'IS', name: 'Iași', region: 'ro-is', macro: 'ro-nord-est', cities: ['Iași', 'Pașcani', 'Hârlău', 'Târgu Frumos'] },
+        { code: 'NT', name: 'Neamț', region: 'ro-nt', macro: 'ro-nord-est', cities: ['Piatra-Neamț', 'Roman', 'Târgu Neamț', 'Bicaz'] },
+        { code: 'SV', name: 'Suceava', region: 'ro-sv', macro: 'ro-nord-est', cities: ['Suceava', 'Fălticeni', 'Rădăuți', 'Câmpulung Moldovenesc', 'Vatra Dornei'] },
+        { code: 'VS', name: 'Vaslui', region: 'ro-vs', macro: 'ro-nord-est', cities: ['Vaslui', 'Bârlad', 'Huși', 'Negrești'] },
+
+        { code: 'BR', name: 'Brăila', region: 'ro-br', macro: 'ro-sud-est', cities: ['Brăila', 'Ianca', 'Făurei'] },
+        { code: 'BZ', name: 'Buzău', region: 'ro-bz', macro: 'ro-sud-est', cities: ['Buzău', 'Râmnicu Sărat', 'Nehoiu'] },
+        { code: 'CT', name: 'Constanța', region: 'ro-ct', macro: 'ro-sud-est', cities: ['Constanța', 'Mangalia', 'Medgidia', 'Năvodari', 'Cernavodă'] },
+        { code: 'GL', name: 'Galați', region: 'ro-gl', macro: 'ro-sud-est', cities: ['Galați', 'Tecuci', 'Târgu Bujor'] },
+        { code: 'TL', name: 'Tulcea', region: 'ro-tl', macro: 'ro-sud-est', cities: ['Tulcea', 'Babadag', 'Măcin', 'Sulina'] },
+        { code: 'VN', name: 'Vrancea', region: 'ro-vn', macro: 'ro-sud-est', cities: ['Focșani', 'Adjud', 'Mărășești', 'Panciu'] },
+
+        { code: 'AG', name: 'Argeș', region: 'ro-ag', macro: 'ro-sud-muntenia', cities: ['Pitești', 'Mioveni', 'Câmpulung', 'Curtea de Argeș'] },
+        { code: 'CL', name: 'Călărași', region: 'ro-cl', macro: 'ro-sud-muntenia', cities: ['Călărași', 'Oltenița', 'Lehliu-Gară'] },
+        { code: 'DB', name: 'Dâmbovița', region: 'ro-db', macro: 'ro-sud-muntenia', cities: ['Târgoviște', 'Moreni', 'Pucioasa', 'Găești', 'Titu'] },
+        { code: 'GR', name: 'Giurgiu', region: 'ro-gr', macro: 'ro-sud-muntenia', cities: ['Giurgiu', 'Bolintin-Vale', 'Mihăilești'] },
+        { code: 'IL', name: 'Ialomița', region: 'ro-il', macro: 'ro-sud-muntenia', cities: ['Slobozia', 'Fetești', 'Urziceni', 'Țăndărei'] },
+        { code: 'PH', name: 'Prahova', region: 'ro-ph', macro: 'ro-sud-muntenia', cities: ['Ploiești', 'Câmpina', 'Băicoi', 'Sinaia', 'Bușteni', 'Vălenii de Munte'] },
+        { code: 'TR', name: 'Teleorman', region: 'ro-tr', macro: 'ro-sud-muntenia', cities: ['Alexandria', 'Roșiorii de Vede', 'Turnu Măgurele', 'Zimnicea'] },
+
+        { code: 'B', name: 'București', region: 'ro-b', macro: 'ro-b-if', cities: ['București', 'Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6'] },
+        { code: 'IF', name: 'Ilfov', region: 'ro-if', macro: 'ro-b-if', cities: ['Buftea', 'Otopeni', 'Voluntari', 'Pantelimon', 'Popești-Leordeni'] },
+
+        { code: 'DJ', name: 'Dolj', region: 'ro-dj', macro: 'ro-sud-vest-oltenia', cities: ['Craiova', 'Băilești', 'Calafat', 'Filiași'] },
+        { code: 'GJ', name: 'Gorj', region: 'ro-gj', macro: 'ro-sud-vest-oltenia', cities: ['Târgu Jiu', 'Motru', 'Rovinari'] },
+        { code: 'MH', name: 'Mehedinți', region: 'ro-mh', macro: 'ro-sud-vest-oltenia', cities: ['Drobeta-Turnu Severin', 'Strehaia', 'Orșova'] },
+        { code: 'OT', name: 'Olt', region: 'ro-ot', macro: 'ro-sud-vest-oltenia', cities: ['Slatina', 'Caracal', 'Balș', 'Corabia'] },
+        { code: 'VL', name: 'Vâlcea', region: 'ro-vl', macro: 'ro-sud-vest-oltenia', cities: ['Râmnicu Vâlcea', 'Drăgășani', 'Călimănești', 'Horezu'] },
+
+        { code: 'AR', name: 'Arad', region: 'ro-ar', macro: 'ro-vest', cities: ['Arad', 'Ineu', 'Lipova', 'Pecica'] },
+        { code: 'CS', name: 'Caraș-Severin', region: 'ro-cs', macro: 'ro-vest', cities: ['Reșița', 'Caransebeș', 'Bocșa', 'Oravița'] },
+        { code: 'HD', name: 'Hunedoara', region: 'ro-hd', macro: 'ro-vest', cities: ['Deva', 'Hunedoara', 'Petroșani', 'Vulcan', 'Lupeni'] },
+        { code: 'TM', name: 'Timiș', region: 'ro-tm', macro: 'ro-vest', cities: ['Timișoara', 'Lugoj', 'Sânnicolau Mare', 'Jimbolia', 'Deta'] }
+      ];
+
+      var selectedMacro = 'all';
+      var searchQuery = '';
+      var toastTimer = null;
+
+      var container = document.getElementById('regions-container');
+      var chipsEl = document.getElementById('macro-chips');
+      var searchInput = document.getElementById('region-search');
+      var statsEl = document.getElementById('filter-stats');
+      var toastEl = document.getElementById('copy-toast');
+
+      function normalize(str) {
+        return (str || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .trim();
+      }
+
+      function showToast(msg) {
+        if (!toastEl) return;
+        if (toastTimer) clearTimeout(toastTimer);
+        toastEl.textContent = msg;
+        toastEl.classList.add('visible');
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove('visible');
+        }, 2200);
+      }
+
+      function copyScope(value, btn) {
+        function markCopied() {
+          showToast('Copiat: ' + value);
+          if (btn) {
+            btn.classList.add('copied');
+            setTimeout(function () { btn.classList.remove('copied'); }, 1100);
+          }
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(value).then(markCopied).catch(function () {
+            fallbackCopy(value, markCopied);
+          });
+        } else {
+          fallbackCopy(value, markCopied);
+        }
+      }
+
+      function fallbackCopy(text, onDone) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          onDone();
+        } catch (e) {
+          showToast('Nu s-a putut copia automat.');
+        }
+        document.body.removeChild(ta);
+      }
+
+      function createCopyIcon() {
+        var ns = 'http://www.w3.org/2000/svg';
+        var svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        svg.setAttribute('stroke-linecap', 'round');
+        svg.setAttribute('stroke-linejoin', 'round');
+        svg.setAttribute('aria-hidden', 'true');
+
+        var rect = document.createElementNS(ns, 'rect');
+        rect.setAttribute('x', '9');
+        rect.setAttribute('y', '9');
+        rect.setAttribute('width', '13');
+        rect.setAttribute('height', '13');
+        rect.setAttribute('rx', '2');
+        rect.setAttribute('ry', '2');
+
+        var path = document.createElementNS(ns, 'path');
+        path.setAttribute('d', 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1');
+
+        svg.appendChild(rect);
+        svg.appendChild(path);
+        return svg;
+      }
+
+      function createScopeButton(scopeValue) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'scope-btn';
+        btn.setAttribute('data-copy', scopeValue);
+        btn.title = 'Copiază scope ' + scopeValue;
+
+        var label = document.createElement('span');
+        label.textContent = scopeValue;
+        btn.appendChild(label);
+        btn.appendChild(createCopyIcon());
+
+        btn.addEventListener('click', function () {
+          copyScope(scopeValue, btn);
+        });
+        return btn;
+      }
+
+      function renderChips() {
+        chipsEl.textContent = '';
+
+        var allBtn = document.createElement('button');
+        allBtn.type = 'button';
+        allBtn.className = 'macro-chip' + (selectedMacro === 'all' ? ' active' : '');
+        allBtn.textContent = 'Toate (42)';
+        allBtn.addEventListener('click', function () {
+          selectedMacro = 'all';
+          renderChips();
+          renderRegions();
+        });
+        chipsEl.appendChild(allBtn);
+
+        MACRO_REGIONS.forEach(function (macro) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'macro-chip' + (selectedMacro === macro.id ? ' active' : '');
+          btn.textContent = macro.nuts + ' · ' + macro.name;
+          btn.addEventListener('click', function () {
+            selectedMacro = macro.id;
+            renderChips();
+            renderRegions();
+          });
+          chipsEl.appendChild(btn);
+        });
+      }
+
+      function renderRegions() {
+        container.textContent = '';
+        var q = normalize(searchQuery);
+        var visibleMacros = 0;
+        var visibleCounties = 0;
+
+        MACRO_REGIONS.forEach(function (macro) {
+          if (selectedMacro !== 'all' && macro.id !== selectedMacro) {
+            return;
+          }
+
+          var macroHaystack = normalize(macro.name + ' ' + macro.nuts + ' ' + macro.id + ' ' + macro.channel);
+          var macroMatches = q && macroHaystack.indexOf(q) !== -1;
+
+          var countiesInMacro = COUNTIES.filter(function (c) {
+            if (c.macro !== macro.id) return false;
+            if (!q || macroMatches) return true;
+            var countyHaystack = normalize(
+              c.name + ' ' + c.code + ' ' + c.region + ' #' + c.code + ' ' + c.cities.join(' ')
+            );
+            return countyHaystack.indexOf(q) !== -1;
+          });
+
+          if (countiesInMacro.length === 0) {
+            return;
+          }
+
+          visibleMacros++;
+          visibleCounties += countiesInMacro.length;
+
+          var section = document.createElement('article');
+          section.className = 'macro-section';
+          section.id = macro.id;
+
+          var header = document.createElement('div');
+          header.className = 'macro-header';
+
+          var titleGroup = document.createElement('div');
+          titleGroup.className = 'macro-title-group';
+
+          var nuts = document.createElement('span');
+          nuts.className = 'nuts-badge';
+          nuts.textContent = macro.nuts;
+
+          var h2 = document.createElement('h2');
+          h2.textContent = macro.name;
+
+          titleGroup.appendChild(nuts);
+          titleGroup.appendChild(h2);
+          titleGroup.appendChild(createScopeButton(macro.id));
+
+          var meta = document.createElement('div');
+          meta.className = 'macro-meta';
+
+          var chTag = document.createElement('span');
+          chTag.className = 'channel-tag';
+          chTag.textContent = macro.channel;
+
+          var parentTxt = document.createElement('span');
+          parentTxt.textContent = 'Părinte: ' + macro.parent + ' · ' + countiesInMacro.length + (countiesInMacro.length === 1 ? ' județ' : ' județe');
+
+          meta.appendChild(chTag);
+          meta.appendChild(parentTxt);
+
+          header.appendChild(titleGroup);
+          header.appendChild(meta);
+          section.appendChild(header);
+
+          var table = document.createElement('table');
+          table.className = 'counties-table';
+
+          var thead = document.createElement('thead');
+          var headRow = document.createElement('tr');
+          ['Județ', 'Scope MeshCore', 'Canale locale', 'Orașe principale (scope județean)'].forEach(function (col) {
+            var th = document.createElement('th');
+            th.textContent = col;
+            headRow.appendChild(th);
+          });
+          thead.appendChild(headRow);
+          table.appendChild(thead);
+
+          var tbody = document.createElement('tbody');
+          countiesInMacro.forEach(function (c) {
+            var tr = document.createElement('tr');
+
+            var tdName = document.createElement('td');
+            tdName.className = 'county-name-cell';
+            tdName.setAttribute('data-label', 'Județ');
+            tdName.textContent = c.name;
+            var codeSpan = document.createElement('span');
+            codeSpan.className = 'county-code';
+            codeSpan.textContent = c.code;
+            tdName.appendChild(codeSpan);
+
+            var tdScope = document.createElement('td');
+            tdScope.setAttribute('data-label', 'Scope MeshCore');
+            tdScope.appendChild(createScopeButton(c.region));
+
+            var tdChannels = document.createElement('td');
+            tdChannels.setAttribute('data-label', 'Canale locale');
+            var chWrap = document.createElement('div');
+            chWrap.className = 'channels-cell';
+
+            var countyCh = document.createElement('span');
+            countyCh.className = 'channel-tag';
+            countyCh.textContent = '#' + c.code.toLowerCase();
+
+            var alertCh = document.createElement('span');
+            alertCh.className = 'channel-tag';
+            alertCh.textContent = '#alerte';
+
+            chWrap.appendChild(countyCh);
+            chWrap.appendChild(alertCh);
+            tdChannels.appendChild(chWrap);
+
+            var tdCities = document.createElement('td');
+            tdCities.className = 'cities-cell';
+            tdCities.setAttribute('data-label', 'Orașe principale');
+            tdCities.textContent = c.cities.join(', ');
+
+            tr.appendChild(tdName);
+            tr.appendChild(tdScope);
+            tr.appendChild(tdChannels);
+            tr.appendChild(tdCities);
+            tbody.appendChild(tr);
+          });
+
+          table.appendChild(tbody);
+          section.appendChild(table);
+          container.appendChild(section);
+        });
+
+        if (visibleCounties === 0) {
+          var empty = document.createElement('div');
+          empty.className = 'empty-state';
+          empty.textContent = 'Nicio regiune sau localitate nu corespunde căutării.';
+          container.appendChild(empty);
+        }
+
+        statsEl.textContent = visibleMacros + (visibleMacros === 1 ? ' macro-regiune' : ' macro-regiuni') +
+          ' · ' + visibleCounties + (visibleCounties === 1 ? ' județ' : ' județe');
+      }
+
+      document.querySelectorAll('.dag-card .scope-btn').forEach(function (btn) {
+        btn.appendChild(createCopyIcon());
+        btn.addEventListener('click', function () {
+          copyScope(btn.getAttribute('data-copy'), btn);
+        });
+      });
+
+      searchInput.addEventListener('input', function (e) {
+        searchQuery = e.target.value;
+        renderRegions();
+      });
+
+      renderChips();
+      renderRegions();
+    })();
+  </script>
+
+  <script>
+    (function () {
+      'use strict';
+      var STORAGE_KEY = 'ro-mesh-theme';
+      var html = document.documentElement;
+      var btnAuto = document.getElementById('theme-auto');
+      var btnLight = document.getElementById('theme-light');
+      var btnDark = document.getElementById('theme-dark');
+      var buttons = [btnAuto, btnLight, btnDark];
+
+      function syncButtons(activeVal) {
+        buttons.forEach(function (btn) {
+          if (!btn) return;
+          btn.setAttribute('aria-pressed', btn.dataset.themeVal === activeVal ? 'true' : 'false');
+        });
+      }
+
+      function applyTheme(themeVal) {
+        if (themeVal === 'light' || themeVal === 'dark') {
+          html.setAttribute('data-theme', themeVal);
+          try { localStorage.setItem(STORAGE_KEY, themeVal); } catch (e) { }
+        } else {
+          html.removeAttribute('data-theme');
+          try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
+        }
+        syncButtons(themeVal);
+      }
+
+      var currentTheme = html.getAttribute('data-theme') || '';
+      syncButtons(currentTheme);
+
+      buttons.forEach(function (btn) {
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          applyTheme(btn.dataset.themeVal);
+        });
+      });
+
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+          var storedTheme = '';
+          try { storedTheme = localStorage.getItem(STORAGE_KEY) || ''; } catch (e) { }
+          if (!storedTheme) {
+            syncButtons('');
+          }
+        });
+      }
+    })();
+  </script>
+
+  <script src="/js/search-index.js"></script>
+  <script src="/js/search.js"></script>
+  <div id="search-overlay" class="search-fullscreen hidden">
+    <button id="close-search-overlay" class="search-close-btn" aria-label="Închide căutarea">&times;</button>
+    <div class="search-overlay-header">
+      <input type="text" id="giant-search-input" placeholder="Caută în portal...">
+    </div>
+    <div id="search-results-container" class="search-results-fullscreen"></div>
+  </div>
+  <div id="pwa-install-banner" class="pwa-banner hidden">
+    <div class="pwa-banner-content">
+      <span class="pwa-icon">📡</span>
+      <div class="pwa-text">
+        <strong>Instalează RO-MESH</strong>
+        <p>Adaugă portalul pe ecranul principal pentru acces rapid și complet offline.</p>
+      </div>
+    </div>
+    <div class="pwa-actions">
+      <button id="pwa-install-btn" class="btn-primary">Instalează</button>
+      <button id="pwa-dismiss-btn" class="btn-secondary" aria-label="Nu acum">&times;</button>
+    </div>
+  </div>
+  <script src="/js/pwa-install.js"></script>
+  <script src="/js/scroll-top.js"></script>
+</body>
+
+</html>
